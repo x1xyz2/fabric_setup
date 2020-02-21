@@ -8,7 +8,7 @@
 
 # Start
 
-> cryptogen
+#### cryptogen
 
 ```
 $ cryptogen generate --config=./crypto-config.yaml
@@ -16,7 +16,7 @@ org1.example.com
 org2.example.com
 ```
 
-> configtxgen (genesis.block, SampleMultiNodeEtcdRaft mode)
+#### configtxgen (genesis.block, SampleMultiNodeEtcdRaft mode)
 
 ```
 $ export FABRIC_CFG_PATH=$PWD
@@ -26,7 +26,7 @@ $ configtxgen -profile SampleMultiNodeEtcdRaft -channelID byfn-sys-channel -outp
 2020-02-21 12:22:59.848 KST [common.tools.configtxgen] doOutputBlock -> INFO 008 Writing genesis block
 ```
 
-> configtxgen (channel, anchorPeer)
+#### configtxgen (channel, anchorPeer)
 
 ```
 $ export CHANNEL_NAME=mychannel
@@ -46,7 +46,7 @@ $ configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifac
 2020-02-21 12:32:50.062 KST [common.tools.configtxgen] doOutputAnchorPeersUpdate -> INFO 006 Writing anchor peer update
 ```
 
-> Command Only
+#### Command Only
 ```
 cryptogen generate --config=./crypto-config.yaml
 export FABRIC_CFG_PATH=$PWD
@@ -58,7 +58,7 @@ configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts
 ```
 
 
-> docker 이미지 실행
+#### docker 이미지 실행
 
 ```
 $ docker-compose -f docker-compose-cli.yaml -f docker-compose-etcdraft2.yaml up -d
@@ -79,13 +79,13 @@ peer1.org2.example.com   peer node start   Up      0.0.0.0:10051->10051/tcp
 
 ```
 
-> cli 컨테이너 접속
+#### cli 컨테이너 접속
 
 ```
 $ docker exec -it cli bash
 ```
 
-> Create + Join Channel
+#### Create + Join Channel
 ```
 $ export CHANNEL_NAME=mychannel
 $ peer channel create -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
@@ -116,7 +116,7 @@ $ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/cry
 
 
 
-> Anchor Peer
+#### Set Anchor Peer
 ```
 $ peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 2020-02-21 05:25:33.350 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
@@ -127,7 +127,7 @@ $ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/cry
 2020-02-21 05:26:19.099 UTC [channelCmd] update -> INFO 002 Successfully submitted channel update
 ```
 
-> Install & Instantiate Chaincode
+#### Install & Instantiate Chaincode
 ```
 $ peer chaincode install -n mycc -v 1.0 -l node -p /opt/gopath/src/github.com/chaincode/chaincode_example02/node/
 2020-02-21 05:27:05.842 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc

@@ -1,4 +1,4 @@
-# build your first n/w
+# Build your first n/w
 
 - Version: [1.4.4][byfn_link]
 
@@ -6,7 +6,7 @@
 
 - Orderer: etcdraft mode 
 
-# Build
+# Start
 
 > cryptogen
 

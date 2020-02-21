@@ -10,78 +10,10 @@ org2.example.com
 
 > configtxgen (genesis.block, SampleMultiNodeEtcdRaft mode)
 
-1.4.5 버전의 configtx.yaml 파일을 확인한 바, EtcdRaft 설정이 빠져 있는 경우가 있어, 아래와 같이 추가가 필요할 수도 있음
-
-```
-$ vim configtx.yaml
-
-(Orderer Configuration)
-
-    # EtcdRaft defines configuration which must be set when the "etcdraft"
-    # orderertype is chosen.
-    EtcdRaft:
-        # The set of Raft replicas for this network. For the etcd/raft-based
-        # implementation, we expect every replica to also be an OSN. Therefore,
-        # a subset of the host:port items enumerated in this list should be
-        # replicated under the Orderer.Addresses key above.
-        Consenters:
-          - Host: orderer.example.com
-              Port: 7050
-              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
-          - Host: orderer2.example.com
-              Port: 8050
-              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
-          - Host: orderer3.example.com
-              Port: 9050
-              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
-          - Host: orderer4.example.com
-              Port: 10050
-              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
-          - Host: orderer5.example.com
-              Port: 11050
-              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer5.example.com/tls/server.crt
-
-        # Options to be specified for all the etcd/raft nodes. The values here
-        # are the defaults for all new channels and can be modified on a
-        # per-channel basis via configuration updates.
-        Options:
-            # TickInterval is the time interval between two Node.Tick invocations.
-            TickInterval: 500ms
-
-            # ElectionTick is the number of Node.Tick invocations that must pass
-            # between elections. That is, if a follower does not receive any
-            # message from the leader of current term before ElectionTick has
-            # elapsed, it will become candidate and start an election.
-            # ElectionTick must be greater than HeartbeatTick.
-            ElectionTick: 10
-
-            # HeartbeatTick is the number of Node.Tick invocations that must
-            # pass between heartbeats. That is, a leader sends heartbeat
-            # messages to maintain its leadership every HeartbeatTick ticks.
-            HeartbeatTick: 1
-
-            # MaxInflightBlocks limits the max number of in-flight append messages
-            # during optimistic replication phase.
-            MaxInflightBlocks: 5
-
-            # SnapshotIntervalSize defines number of bytes per which a snapshot is taken
-            SnapshotIntervalSize: 20 MB
-```
-
 ```
 $ export FABRIC_CFG_PATH=$PWD
 $ configtxgen -profile SampleMultiNodeEtcdRaft -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
-2020-02-21 12:22:59.775 KST [common.tools.configtxgen] main -> INFO 001 Loading configuration
-2020-02-21 12:22:59.810 KST [common.tools.configtxgen.localconfig] completeInitialization -> INFO 002 orderer type: etcdraft
-2020-02-21 12:22:59.810 KST [common.tools.configtxgen.localconfig] completeInitialization -> INFO 003 Orderer.EtcdRaft.Options unset, setting to tick_interval:"500ms" election_tick:10 heartbeat_tick:1 max_inflight_blocks:5 snapshot_interval_size:20971520 
-2020-02-21 12:22:59.810 KST [common.tools.configtxgen.localconfig] Load -> INFO 004 Loaded configuration: /home/smart/fabric-samples/first-network/configtx.yaml
-2020-02-21 12:22:59.846 KST [common.tools.configtxgen.localconfig] completeInitialization -> INFO 005 orderer type: etcdraft
-2020-02-21 12:22:59.846 KST [common.tools.configtxgen.localconfig] LoadTopLevel -> INFO 006 Loaded configuration: /home/smart/fabric-samples/first-network/configtx.yaml
+
 2020-02-21 12:22:59.847 KST [common.tools.configtxgen] doOutputBlock -> INFO 007 Generating genesis block
 2020-02-21 12:22:59.848 KST [common.tools.configtxgen] doOutputBlock -> INFO 008 Writing genesis block
 ```
@@ -106,8 +38,82 @@ $ configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifac
 2020-02-21 12:32:50.062 KST [common.tools.configtxgen] doOutputAnchorPeersUpdate -> INFO 006 Writing anchor peer update
 ```
 
+> Command Only
+```
+cryptogen generate --config=./crypto-config.yaml
+export FABRIC_CFG_PATH=$PWD
+configtxgen -profile SampleMultiNodeEtcdRaft -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
+export CHANNEL_NAME=mychannel
+configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID $CHANNEL_NAME
+configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org1MSP
+configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org2MSP
+```
 
 
+> docker 이미지 실행
+
+```
+$ docker-compose -f docker-compose-cli.yaml -f docker-compose-etcdraft2.yaml up -d
+
+$ docker-compose -f docker-compose-cli.yaml -f docker-compose-etcdraft2.yaml ps
+         Name                Command       State            Ports          
+---------------------------------------------------------------------------
+cli                      /bin/bash         Up                              
+orderer.example.com      orderer           Up      0.0.0.0:7050->7050/tcp  
+orderer2.example.com     orderer           Up      0.0.0.0:8050->7050/tcp  
+orderer3.example.com     orderer           Up      0.0.0.0:9050->7050/tcp  
+orderer4.example.com     orderer           Up      0.0.0.0:10050->7050/tcp 
+orderer5.example.com     orderer           Up      0.0.0.0:11050->7050/tcp 
+peer0.org1.example.com   peer node start   Up      0.0.0.0:7051->7051/tcp  
+peer0.org2.example.com   peer node start   Up      0.0.0.0:9051->9051/tcp  
+peer1.org1.example.com   peer node start   Up      0.0.0.0:8051->8051/tcp  
+peer1.org2.example.com   peer node start   Up      0.0.0.0:10051->10051/tcp
+
+```
+
+> cli 컨테이너 접속
+
+```
+$ docker exec -it cli bash
+```
+
+> Create + Join Channel
+```
+$ export CHANNEL_NAME=mychannel
+$ peer channel create -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+2020-02-21 05:23:21.937 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
+2020-02-21 05:23:21.950 UTC [cli.common] readBlock -> INFO 002 Got status: &{NOT_FOUND}
+2020-02-21 05:23:21.951 UTC [channelCmd] InitCmdFactory -> INFO 003 Endorser and orderer connections initialized
+2020-02-21 05:23:22.152 UTC [cli.common] readBlock -> INFO 004 Got status: &{SERVICE_UNAVAILABLE}
+2020-02-21 05:23:22.154 UTC [channelCmd] InitCmdFactory -> INFO 005 Endorser and orderer connections initialized
+2020-02-21 05:23:22.354 UTC [cli.common] readBlock -> INFO 006 Got status: &{SERVICE_UNAVAILABLE}
+2020-02-21 05:23:22.356 UTC [channelCmd] InitCmdFactory -> INFO 007 Endorser and orderer connections initialized
+2020-02-21 05:23:22.556 UTC [cli.common] readBlock -> INFO 008 Got status: &{SERVICE_UNAVAILABLE}
+2020-02-21 05:23:22.558 UTC [channelCmd] InitCmdFactory -> INFO 009 Endorser and orderer connections initialized
+2020-02-21 05:23:22.758 UTC [cli.common] readBlock -> INFO 00a Got status: &{SERVICE_UNAVAILABLE}
+2020-02-21 05:23:22.760 UTC [channelCmd] InitCmdFactory -> INFO 00b Endorser and orderer connections initialized
+2020-02-21 05:23:22.960 UTC [cli.common] readBlock -> INFO 00c Got status: &{SERVICE_UNAVAILABLE}
+2020-02-21 05:23:22.962 UTC [channelCmd] InitCmdFactory -> INFO 00d Endorser and orderer connections initialized
+2020-02-21 05:23:23.164 UTC [cli.common] readBlock -> INFO 00e Received block: 0
+
+$ peer channel join -b mychannel.block
+2020-02-21 05:23:59.398 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
+2020-02-21 05:23:59.415 UTC [channelCmd] executeJoin -> INFO 002 Successfully submitted proposal to join channel
+
+$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp CORE_PEER_ADDRESS=peer0.org2.example.com:9051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt peer channel join -b mychannel.block
+2020-02-21 05:24:12.854 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
+2020-02-21 05:24:12.872 UTC [channelCmd] executeJoin -> INFO 002 Successfully submitted proposal to join channel
+
+```
+
+
+
+> Anchor Peer
+```
+$ peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp CORE_PEER_ADDRESS=peer0.org2.example.com:9051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org2MSPanchors.tx --tls --cafile $ /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+```
 
 
 

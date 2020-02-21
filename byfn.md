@@ -111,9 +111,28 @@ $ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/cry
 > Anchor Peer
 ```
 $ peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp CORE_PEER_ADDRESS=peer0.org2.example.com:9051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org2MSPanchors.tx --tls --cafile $ /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+2020-02-21 05:25:33.350 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
+2020-02-21 05:25:33.358 UTC [channelCmd] update -> INFO 002 Successfully submitted channel update
 
+$ CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp CORE_PEER_ADDRESS=peer0.org2.example.com:9051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt peer channel update -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org2MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+2020-02-21 05:26:19.090 UTC [channelCmd] InitCmdFactory -> INFO 001 Endorser and orderer connections initialized
+2020-02-21 05:26:19.099 UTC [channelCmd] update -> INFO 002 Successfully submitted channel update
 ```
 
+> Install & Instantiate Chaincode
+```
+$ peer chaincode install -n mycc -v 1.0 -l node -p /opt/gopath/src/github.com/chaincode/chaincode_example02/node/
+2020-02-21 05:27:05.842 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2020-02-21 05:27:05.842 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+2020-02-21 05:27:05.845 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
+$ export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+$ export CORE_PEER_ADDRESS=peer0.org2.example.com:9051
+$ export CORE_PEER_LOCALMSPID="Org2MSP"
+$ export CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+$ peer chaincode install -n mycc -v 1.0 -l node -p /opt/gopath/src/github.com/chaincode/chaincode_example02/node/
+2020-02-21 05:28:31.084 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 001 Using default escc
+2020-02-21 05:28:31.084 UTC [chaincodeCmd] checkChaincodeCmdParams -> INFO 002 Using default vscc
+2020-02-21 05:28:31.088 UTC [chaincodeCmd] install -> INFO 003 Installed remotely response:<status:200 payload:"OK" > 
+```
 
 

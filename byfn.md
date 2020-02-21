@@ -1,5 +1,11 @@
 # build your first n/w
 
+- Version: [1.4.4][byfn_link]
+
+[byfn_link]: https://hyperledger-fabric.readthedocs.io/en/release-1.4/build_network.html
+
+- Orderer: etcdraft mode 
+
 > cryptogen
 
 ```

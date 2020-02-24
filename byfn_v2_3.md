@@ -1,6 +1,6 @@
 # Peer Setup
 
-- Enroll Certs lapr Peer/Admin/User
+- lapr organization (Enroll Certs lapr Peer/Admin/User)
 
 ```
 export FABRIC_CA_CLIENT_MSPDIR=msp

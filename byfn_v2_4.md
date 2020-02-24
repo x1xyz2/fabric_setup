@@ -179,7 +179,7 @@ Orderer: &OrdererDefaults
     OrdererType: etcdraft
 
     Addresses:
-        - orderer.flk.network:7050
+        - orderer1.flk.network:7050
 
     EtcdRaft:
         # The set of Raft replicas for this network. For the etcd/raft-based
@@ -237,7 +237,7 @@ Profiles:
             OrdererType: etcdraft
             EtcdRaft:
                 Consenters:
-                - Host: orderer.flk.network
+                - Host: orderer1.flk.network
                   Port: 7050
                   ClientTLSCert: flk/orderer1/tls/server.crt
                   ServerTLSCert: flk/orderer1/tls/server.crt

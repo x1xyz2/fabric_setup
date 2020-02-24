@@ -192,11 +192,11 @@ services:
     networks:
       - fabric
     extra_hosts:
-      - "orderer1.flk.network:112.172.129.148"
-      - "orderer2.flk.network:112.172.129.148"
-      - "orderer3.flk.network:112.172.129.148"
-      - "orderer4.flk.network:112.172.129.148"
-      - "orderer5.flk.network:112.172.129.148"
+      - "orderer1.flk.network:-"
+      - "orderer2.flk.network:-"
+      - "orderer3.flk.network:-"
+      - "orderer4.flk.network:-"
+      - "orderer5.flk.network:-"
 ```
 - docker-compose-base.yaml
 
@@ -320,10 +320,10 @@ services:
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
     extra_hosts:
-      - "orderer1.flk.network:112.172.129.148"
-      - "orderer2.flk.network:112.172.129.148"
-      - "orderer3.flk.network:112.172.129.148"
-      - "orderer4.flk.network:112.172.129.148"
-      - "orderer5.flk.network:112.172.129.148"
+      - "orderer1.flk.network:-"
+      - "orderer2.flk.network:-"
+      - "orderer3.flk.network:-"
+      - "orderer4.flk.network:-"
+      - "orderer5.flk.network:-"
 
 ```

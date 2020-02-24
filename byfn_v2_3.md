@@ -181,6 +181,7 @@ services:
         - /var/run/:/host/var/run/
         - ./chaincode/:/opt/gopath/src/github.com/chaincode
         - ./lapr:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/lapr
+        - ./oshop:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/oshop
         - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
         - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
     depends_on:

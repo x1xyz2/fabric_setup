@@ -74,6 +74,9 @@ oshop.network
 
 #### NodeOUs Enable (config.yaml)
 
+각 MSP 경로 내에 아래와 같이 Organization Unit을 정의한 config.yaml 파일이 포함되야 함
+Certificate 값은 cacerts 경로 내 파일 명과 일치해야 함
+
 ```
 NodeOUs:
   Enable: true

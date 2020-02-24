@@ -2,9 +2,9 @@
 
 #### docker-compose.yaml
 
-- ca/tlsca.flk.network: 65525, 65524
-- ca/tlsca.lapr.network: 65523, 65522
-- ca/tlsca.oshop.network: 65521, 65520
+- ca/tlsca.flk.network: 65525(ca), 65524(tlsca)
+- ca/tlsca.lapr.network: 65523(ca), 65522(tlsca)
+- ca/tlsca.oshop.network: 65521(ca), 65520(tlsca)
 
 ```
 version: '2'

@@ -2,6 +2,7 @@
 
 #### docker-compose.yaml
 
+peer port
 - ca/tlsca.flk.network: 65525, 65524
 - ca/tlsca.lapr.network: 65523, 65522
 - ca/tlsca.oshop.network: 65521, 65520

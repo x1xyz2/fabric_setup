@@ -105,3 +105,224 @@ cp oshop/peer2/tls/tlscacerts/* oshop/peer2/tls/ca.crt
 cp oshop/peer2/tls/signcerts/* oshop/peer2/tls/server.crt
 cp oshop/peer2/tls/keystore/* oshop/peer2/tls/server.key
 ```
+- docker-compose
+
+```
+--- docker-compose.yaml
+ |
+ |---base
+      |-- docker-compose-base.yaml
+      |-- peer-base.yaml
+```
+
+- docker-compose.yaml
+
+```
+version: '2'
+
+networks:
+  fabric:
+
+services:
+  peer1.lapr.network:
+    container_name: peer1.lapr.network
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.lapr.network
+    networks:
+    - fabric
+
+  peer2.lapr.network:
+    container_name: peer2.lapr.network
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer2.lapr.network
+    networks:
+    - fabric
+
+  peer1.oshop.network:
+    container_name: peer1.oshop.network
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.oshop.network
+    networks:
+    - fabric
+
+  peer2.oshop.network:
+    container_name: peer2.oshop.network
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer2.oshop.network
+    networks:
+    - fabric
+
+  lapr_cli:
+    container_name: lapr_cli
+    image: hyperledger/fabric-tools:1.4.4
+    tty: true
+    stdin_open: true
+    environment:
+      - SYS_CHANNEL=flk-sys-channel
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer1.lapr.network:65500
+      - CORE_PEER_LOCALMSPID=laprMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/lapr/peer1/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/lapr/peer1/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/lapr/peer1/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/lapr/admin/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./chaincode/:/opt/gopath/src/github.com/chaincode
+        - ./lapr:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/lapr
+        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - peer1.lapr.network
+      - peer2.lapr.network
+      - peer1.oshop.network
+      - peer2.oshop.network
+    networks:
+      - fabric
+    extra_hosts:
+      - "orderer1.flk.network:112.172.129.148"
+      - "orderer2.flk.network:112.172.129.148"
+      - "orderer3.flk.network:112.172.129.148"
+      - "orderer4.flk.network:112.172.129.148"
+      - "orderer5.flk.network:112.172.129.148"
+```
+- docker-compose-base.yaml
+
+```
+version: '2'
+
+services:
+
+  peer1.lapr.network:
+    container_name: peer1.lapr.network
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.lapr.network
+      - CORE_PEER_ADDRESS=peer1.lapr.network:65500
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:65500
+      - CORE_PEER_CHAINCODEADDRESS=peer1.lapr.network:65525
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:65525
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer2.lapr.network:65501
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.lapr.network:65500
+      - CORE_PEER_LOCALMSPID=laprMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../lapr/peer1/msp:/etc/hyperledger/fabric/msp
+        - ../lapr/peer1/tls:/etc/hyperledger/fabric/tls
+        - ../lapr/peer1/production:/var/hyperledger/production
+    ports:
+      - 65500:65500
+
+  peer2.lapr.network:
+    container_name: peer2.lapr.network
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer2.lapr.network
+      - CORE_PEER_ADDRESS=peer2.lapr.network:65501
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:65501
+      - CORE_PEER_CHAINCODEADDRESS=peer2.lapr.network:65525
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:65525
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.lapr.network:65500
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2.lapr.network:65501
+      - CORE_PEER_LOCALMSPID=laprMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../lapr/peer2/msp:/etc/hyperledger/fabric/msp
+        - ../lapr/peer2/tls:/etc/hyperledger/fabric/tls
+        - ../lapr/peer2/production:/var/hyperledger/production
+    ports:
+      - 65501:65501
+
+  peer1.oshop.network:
+    container_name: peer1.oshop.network
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.oshop.network
+      - CORE_PEER_ADDRESS=peer1.oshop.network:65502
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:65502
+      - CORE_PEER_CHAINCODEADDRESS=peer1.oshop.network:65525
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:65525
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer2.oshop.network:65503
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.oshop.network:65502
+      - CORE_PEER_LOCALMSPID=oshopMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../oshop/peer1/msp:/etc/hyperledger/fabric/msp
+        - ../oshop/peer1/tls:/etc/hyperledger/fabric/tls
+        - ../oshop/peer1/production:/var/hyperledger/production
+    ports:
+      - 65502:65502
+
+  peer2.oshop.network:
+    container_name: peer2.oshop.network
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer2.oshop.network
+      - CORE_PEER_ADDRESS=peer2.oshop.network:65503
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:65503
+      - CORE_PEER_CHAINCODEADDRESS=peer2.oshop.network:65525
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:65525
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.oshop.network:65502
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2.oshop.network:65503
+      - CORE_PEER_LOCALMSPID=oshopMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../oshop/peer2/msp:/etc/hyperledger/fabric/msp
+        - ../oshop/peer2/tls:/etc/hyperledger/fabric/tls
+        - ../oshop/peer2/production:/var/hyperledger/production
+    ports:
+      - 65503:65503
+
+```
+
+- peer-base.yaml
+```
+version: '2'
+
+services:
+  peer-base:
+    image: hyperledger/fabric-peer:1.4.4
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=chaincode_fabric
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    extra_hosts:
+      - "orderer1.flk.network:112.172.129.148"
+      - "orderer2.flk.network:112.172.129.148"
+      - "orderer3.flk.network:112.172.129.148"
+      - "orderer4.flk.network:112.172.129.148"
+      - "orderer5.flk.network:112.172.129.148"
+
+```

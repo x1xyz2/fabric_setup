@@ -415,9 +415,9 @@ services:
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: orderer
     extra_hosts:
-      - "peer1.lapr.network:112.172.129.80"
-      - "peer2.lapr.network:112.172.129.80"
-      - "peer1.oshop.network:112.172.129.80"
-      - "peer2.oshop.network:112.172.129.80"
+      - "peer1.lapr.network:-"
+      - "peer2.lapr.network:-"
+      - "peer1.oshop.network:-"
+      - "peer2.oshop.network:-"
 
 ```
